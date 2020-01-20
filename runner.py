@@ -95,6 +95,36 @@ def draw_graph(x, y):
     plt.show()
 
 
+def filler(your_list, length):
+    """function that fills not calculated values of list"""
+    for i in range(int(length/2)):
+        your_list.append(None)
+
+
+def smooth_summ(l):
+    s = 0
+    main_devider = 143
+    weights = [-11, 0, 9, 16, 21, 24, 25, 24, 21, 16, 9, 0, -11]
+    if len(l) == len(weights):
+        for i in range(len(weights)):
+            s += l[i]*weights[i]
+    else:
+        print('There is not equal length of weights list and slices length. Maybe something wrong with slices definition')
+        return
+    return s/main_devider
+
+
+def smooth(list):
+    print('here starts smooth\n')
+    n = 13 # len of interval
+    smoothed_list_value = []
+    filler(smoothed_list_value, n)
+    for i in range(len(list) - (n-1)):
+        smoothed_list_value.append(smooth_summ(list[i:n+i]))
+    filler(smoothed_list_value, n)
+    return smoothed_list_value
+
+
 if __name__ == "__main__":
     csv_path = "Weather.csv"
     #l = [55, 44, 33, 12, 64,70,80]
@@ -109,7 +139,10 @@ if __name__ == "__main__":
     sig = mid_square_desp(middle_list, mid_arithmethic(middle_list))
     t = d/sig
     print(t)
-    draw_graph(len(middle_list), middle_list)
-
-
+    #draw_graph(len(middle_list), middle_list)
+    smoothed_values = smooth(middle_list)
+    print(len(smoothed_values) == len(middle_list))
+    print(len(smoothed_values))
+    print(len(middle_list))
+    print(smoothed_values)
 #pivot's index should be the same as list's slice end index
