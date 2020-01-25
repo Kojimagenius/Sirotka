@@ -1,5 +1,6 @@
 import math
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 fields = ['year', 'jan', 'feb', 'march', 'april', 'may', 'june', 'july','august', 'sept', 'oct', 'nov', 'dec', 'year-middle']
@@ -89,10 +90,8 @@ def mid_square_desp(list_orig, pivot):      #pivot's value of mid arithmetic val
 
 
 def draw_graph(x, y):
-    fig, ax = plt.subplots()
-    ax.plot(x, y, lw=2, color='#539caf', alpha=1)
-    ax.set_title('graph')
-    plt.show()
+    pass
+    #todo deligated to borsyakov
 
 
 def filler(your_list, length):
@@ -124,10 +123,24 @@ def smooth(list):
     filler(smoothed_list_value, n)
     return smoothed_list_value
 
+def stepener(mat):
+    shape = getattr(mat, 'shape')
+    for i in range(len(mat)):
+        for j in range(len(mat[i])):
+            mat[i][j] **= i+1
+    print(mat)
+
+
+"""    for i in range(shape[1]):
+        for row in mat:
+            for element in row:
+                element *= getattr(element, 'shape')
+ """   #if hasattr(li, 'length'):
+
+
 
 if __name__ == "__main__":
     csv_path = "Weather.csv"
-    #l = [55, 44, 33, 12, 64,70,80]
 
     with open(csv_path,'r') as f_obj:
         middle_list, err = splitter(fields, f_obj)
@@ -138,11 +151,22 @@ if __name__ == "__main__":
     print('errors counter: ' + err.__str__())
     sig = mid_square_desp(middle_list, mid_arithmethic(middle_list))
     t = d/sig
-    print(t)
+    print('значение t-критерия: '+ t.__str__())
     #draw_graph(len(middle_list), middle_list)
     smoothed_values = smooth(middle_list)
-    print(len(smoothed_values) == len(middle_list))
-    print(len(smoothed_values))
-    print(len(middle_list))
-    print(smoothed_values)
-#pivot's index should be the same as list's slice end index
+    if len(smoothed_values) == len(middle_list):
+        print('smoothed list is relevant')
+    print('here starts matrix:')
+    matrix = np.ones((3, len(middle_list)))
+    for row in matrix:
+        for i in range(len(row)):
+            row[i] = i+1
+    stepener(matrix)
+    #place for regress todo
+
+
+
+    """for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            matrix[i][j] *= 2"""
+
