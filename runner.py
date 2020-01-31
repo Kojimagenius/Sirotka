@@ -1,6 +1,7 @@
 import math
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import linregress
 
 
 fields = ['year', 'jan', 'feb', 'march', 'april', 'may', 'june', 'july','august', 'sept', 'oct', 'nov', 'dec', 'year-middle']
@@ -97,7 +98,7 @@ def draw_graph(x, y):
 def filler(your_list, length):
     """function that fills not calculated values of list"""
     for i in range(int(length/2)):
-        your_list.append(None)
+        your_list.append('None')
 
 
 def smooth_summ(l):
@@ -113,18 +114,21 @@ def smooth_summ(l):
     return s/main_devider
 
 
-def smooth(list):
+def smooth(list, n=13):
     print('here starts smooth\n')
-    n = 13 # len of interval
+    #n = 13 # len of interval
     smoothed_list_value = []
     filler(smoothed_list_value, n)
     for i in range(len(list) - (n-1)):
         smoothed_list_value.append(smooth_summ(list[i:n+i]))
     filler(smoothed_list_value, n)
+    for el in smoothed_list_value: #this part inverses filler with original's list values
+        if el == 'None':
+            smoothed_list_value[smoothed_list_value.index(el)] = list[smoothed_list_value.index(el)]
     return smoothed_list_value
 
+
 def stepener(mat):
-    shape = getattr(mat, 'shape')
     for i in range(len(mat)):
         for j in range(len(mat[i])):
             mat[i][j] **= i+1
@@ -145,9 +149,10 @@ if __name__ == "__main__":
     with open(csv_path,'r') as f_obj:
         middle_list, err = splitter(fields, f_obj)
     f_obj.close()
+    print('data collected')
     gr, ls = leveller(middle_list)
     d = summ_of_side_values(gr, ls)
-    print(d)
+    print('value of side summ:' + d.__str__())
     print('errors counter: ' + err.__str__())
     sig = mid_square_desp(middle_list, mid_arithmethic(middle_list))
     t = d/sig
@@ -156,12 +161,42 @@ if __name__ == "__main__":
     smoothed_values = smooth(middle_list)
     if len(smoothed_values) == len(middle_list):
         print('smoothed list is relevant')
+        #for i in range(len(smoothed_values)):
+            #print('The disstance is {}'.format(abs(middle_list[i] - smoothed_values[i])))
     print('here starts matrix:')
-    matrix = np.ones((3, len(middle_list)))
+    row = np.ones((1, len(middle_list)))
+    for i in range(len(row[0])):
+        row[0][i] = i
+    print(row)
+    A = np.vstack([row[0], np.ones(len(row[0]))]).T
+    print(A)
+    m, c = np.linalg.lstsq(A, smoothed_values, rcond=None)[0]
+    print('m: {}; c: {}'.format(m, c))
+    plt.plot(row[0], smoothed_values, 'o', label='Orig data', markersize=10)
+    plt.plot(row[0], m*row[0] + c, 'r', label='Fitted line')
+    plt.legend()
+    plt.show()
+
+
+
+
+
+
+
+    """matrix = np.ones((3, len(middle_list)))
     for row in matrix:
         for i in range(len(row)):
             row[i] = i+1
     stepener(matrix)
+    sl, intercept, rval, pval, err = linregress(smoothed_values, matrix[0])
+    print('possible coeff\'s: ', sl, 'intercept:', intercept,'r-squared: ', rval**2)
+    row1 = np.ones((1, len(middle_list)))
+    sl, intercept, rval, pval, err = linregress(smoothed_values, row1)
+    print('sl, intercept, r-squared: ', sl, intercept, rval**2)
+    print('row:', row1)
+    matrix = np.concatenate((matrix, row1))"""
+   # print(matrix)
+
     #place for regress todo
 
 
