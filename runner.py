@@ -1,6 +1,8 @@
 import math
 import matplotlib.pyplot as plt
 import numpy as np
+from pylab import *
+from scipy.linalg import *
 from scipy.stats import linregress
 
 
@@ -145,8 +147,7 @@ def stepener(mat):
 
 if __name__ == "__main__":
     csv_path = "Weather.csv"
-
-    with open(csv_path,'r') as f_obj:
+    with open(csv_path, 'r') as f_obj:
         middle_list, err = splitter(fields, f_obj)
     f_obj.close()
     print('data collected')
@@ -157,21 +158,27 @@ if __name__ == "__main__":
     sig = mid_square_desp(middle_list, mid_arithmethic(middle_list))
     t = d/sig
     print('значение t-критерия: '+ t.__str__())
-    #draw_graph(len(middle_list), middle_list)
     smoothed_values = smooth(middle_list)
     if len(smoothed_values) == len(middle_list):
         print('smoothed list is relevant')
         #for i in range(len(smoothed_values)):
             #print('The disstance is {}'.format(abs(middle_list[i] - smoothed_values[i])))
     print('here starts matrix:')
+    x = [i for i in range(len(middle_list))]
+    x2 = [el**2 for el in x]
+    x3 = [el**3 for el in x]
+    y = smoothed_values
+    m = vstack((x3, x2, x, ones(len(middle_list)))).T #определение вектора-функции, ее вида
+    s = lstsq(m, y)[0]# MNK
+    x_prec = linspace(0, len(middle_list), 100)
+    print(s)
     row = np.ones((1, len(middle_list)))
     for i in range(len(row[0])):
         row[0][i] = i
-    print(row)
     A = np.vstack([row[0], np.ones(len(row[0]))]).T
-    print(A)
     m, c = np.linalg.lstsq(A, smoothed_values, rcond=None)[0]
     print('m: {}; c: {}'.format(m, c))
+    plt.plot(x_prec, s[0]*x_prec**3 + s[1]*x_prec**2 + s[2]*x_prec + s[3], 'b', label='Least square fit', lw=2)
     plt.plot(row[0], smoothed_values, 'o', label='Orig data', markersize=10)
     plt.plot(row[0], m*row[0] + c, 'r', label='Fitted line')
     plt.legend()
