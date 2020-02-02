@@ -92,11 +92,6 @@ def mid_square_desp(list_orig, pivot):      #pivot's value of mid arithmetic val
     return math.sqrt(mid_arithmethic(semi_list))
 
 
-def draw_graph(x, y):
-    pass
-    #todo deligated to borsyakov
-
-
 def filler(your_list, length):
     """function that fills not calculated values of list"""
     for i in range(int(length/2)):
@@ -130,19 +125,28 @@ def smooth(list, n=13):
     return smoothed_list_value
 
 
-def stepener(mat):
-    for i in range(len(mat)):
-        for j in range(len(mat[i])):
-            mat[i][j] **= i+1
-    print(mat)
+def stepener(row, power):
+    powered_row = [el**power for el in row]
+    return powered_row
 
 
-"""    for i in range(shape[1]):
-        for row in mat:
-            for element in row:
-                element *= getattr(element, 'shape')
- """   #if hasattr(li, 'length'):
-
+def checker(mnk_row, orig_row):
+    p = 0
+    if len(mnk_row) == len(orig_row):
+        for i in range(len(mnk_row)):
+            if abs(mnk_row[i] - orig_row[i]) < 1:
+                p+=1
+        q = len(mnk_row) - p
+        u = p/(p+q)
+        mid = []
+        for i in range(len(orig_row)):
+            mid.append(abs(mnk_row[i] - orig_row[i]))
+        mid = sum(mid)/len(orig_row)
+    else:
+        print('not equal length of parametrs in checker')
+        return
+    return {'mid_value':mid,
+            'u_value': u}
 
 
 if __name__ == "__main__":
@@ -165,20 +169,25 @@ if __name__ == "__main__":
             #print('The disstance is {}'.format(abs(middle_list[i] - smoothed_values[i])))
     print('here starts matrix:')
     x = [i for i in range(len(middle_list))]
-    x2 = [el**2 for el in x]
-    x3 = [el**3 for el in x]
+    x2 = stepener(x, 2)
+    x3 = stepener(x, 3)
+    x4 = stepener(x, 4)
+    x5 = stepener(x, 5)
+    x6 = stepener(x, 6)
+    x7 = stepener(x, 7)
     y = smoothed_values
-    m = vstack((x3, x2, x, ones(len(middle_list)))).T #определение вектора-функции, ее вида
+    m = vstack((x7, x6, x5, x4, x3, x2, x, ones(len(middle_list)))).T #определение вектора-функции, ее вида
     s = lstsq(m, y)[0]# MNK
-    x_prec = linspace(0, len(middle_list), 100)
-    print(s)
+    x_prec = linspace(0, len(middle_list), 100) # def of the segment
+    func = s[0]*x_prec**7 + s[1]*x_prec**6 + s[2]*x_prec**5 + s[3]*x_prec**4 + s[4]*x_prec**3 + s[5]*x_prec**2 + s[6]*x_prec + s[7]
+    print(checker(func, y))
     row = np.ones((1, len(middle_list)))
     for i in range(len(row[0])):
         row[0][i] = i
     A = np.vstack([row[0], np.ones(len(row[0]))]).T
     m, c = np.linalg.lstsq(A, smoothed_values, rcond=None)[0]
     print('m: {}; c: {}'.format(m, c))
-    plt.plot(x_prec, s[0]*x_prec**3 + s[1]*x_prec**2 + s[2]*x_prec + s[3], 'b', label='Least square fit', lw=2)
+    plt.plot(x_prec, func, 'b', label='Least square fit power of: {}'.format(len(s) - 1), lw=2)
     plt.plot(row[0], smoothed_values, 'o', label='Orig data', markersize=10)
     plt.plot(row[0], m*row[0] + c, 'r', label='Fitted line')
     plt.legend()
@@ -204,7 +213,6 @@ if __name__ == "__main__":
     matrix = np.concatenate((matrix, row1))"""
    # print(matrix)
 
-    #place for regress todo
 
 
 
