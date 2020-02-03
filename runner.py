@@ -180,13 +180,21 @@ if __name__ == "__main__":
     s = lstsq(m, y)[0]# MNK
     x_prec = linspace(0, len(middle_list), 100) # def of the segment
     func = s[0]*x_prec**7 + s[1]*x_prec**6 + s[2]*x_prec**5 + s[3]*x_prec**4 + s[4]*x_prec**3 + s[5]*x_prec**2 + s[6]*x_prec + s[7]
-    print(checker(func, y))
+    print('Checker: {}'.format(checker(func, y)))
+
+    x_sin = [math.sin(i) for i in x]
+    x_cos = [math.cos(i) for i in x]
+    vec = vstack((x_cos, x_sin, x, ones(len(middle_list)))).T
+    coef = lstsq(vec, smoothed_values)[0]
+    print(len(coef))
+    func1 = coef[0]*cos(x_prec) + coef[1]*sin(x_prec) + coef[2]*x_prec + coef[3]
     row = np.ones((1, len(middle_list)))
     for i in range(len(row[0])):
         row[0][i] = i
     A = np.vstack([row[0], np.ones(len(row[0]))]).T
     m, c = np.linalg.lstsq(A, smoothed_values, rcond=None)[0]
     print('m: {}; c: {}'.format(m, c))
+    plt.plot(x_prec, func1, 'g', label='trigonometrical fit', lw=2)
     plt.plot(x_prec, func, 'b', label='Least square fit power of: {}'.format(len(s) - 1), lw=2)
     plt.plot(row[0], smoothed_values, 'o', label='Orig data', markersize=10)
     plt.plot(row[0], m*row[0] + c, 'r', label='Fitted line')
